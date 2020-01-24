@@ -1,0 +1,245 @@
+#include <Altino.h>
+SensorData data;
+
+int ir1, ir2, ir3, ir4, ir5, ir6;
+int forward_speed=390;
+int backward_speed=-370;
+
+int cds;
+int tunnelCount=0;
+void Auto(int ir1, int ir2, int ir3,int ir4, int ir5);
+
+
+void setup() {
+  Serial.begin(115200);
+   while(1) {
+    data=Sensor(1);
+    ir2=data.IRSensor[1];
+    if(ir2>500)
+      break;
+    }
+    while(1) {
+    data=Sensor(1);
+    ir4=data.IRSensor[3];
+    if(ir4>500)
+      break;
+    }
+    while(1) {
+    data=Sensor(1);
+    ir6=data.IRSensor[5];
+    if(ir6>700)
+      break;
+    }
+     Led(0x0003);
+  }
+  
+void loop() {
+  
+  while(1) {
+    data=Sensor(1);
+    ir1=data.IRSensor[0];
+    ir2=data.IRSensor[1];
+    ir3=data.IRSensor[2];
+    ir4=data.IRSensor[3];
+    ir5=data.IRSensor[4];
+    cds=48+data.CDSSensor;
+   if(cds<400){
+    tunnelCount++;
+    break;  }
+    Auto(ir1,ir2,ir3,ir4,ir5);
+ }
+   
+   if(tunnelCount==1){
+    Go(0,0);
+    Display('1');
+    delay(500);
+    Display('2');
+    delay(500);
+    Display('3');
+    delay(500);
+    Display('4');
+    delay(500);
+    Display('5');
+    delay(500);
+    Display(0);
+  }
+    
+  if(tunnelCount==3){
+    Go(0,0);
+    DisplayLine(0x81,0x42,0x24,0x18,0x18,0x24,0x42,0x81);
+    delay(500);
+    DisplayLine(0xc0,0x60,0x30,0x1f,0x1f,0x30,0x60,0xc0);
+    delay(500);
+    DisplayLine(0x81,0x83,0x85,0x89,0x91,0xa1,0xc1,0x81);
+    delay(500);
+    Display(0);
+   }
+
+  if(tunnelCount==4){
+    Go(0,0);
+    Display('P');
+    Steering(3);
+    Go(380,380);
+    delay(1800);
+
+    Steering(2);
+    Go(380,380);
+    delay(200);
+  
+  while(1){
+    data=Sensor(1);
+    ir2=data.IRSensor[1];
+    Steering(2);
+    Go(350,350);
+    if(ir2>40){
+      Go(0,0);
+      break; } 
+    }
+    Display(0);
+    delay(1000);
+
+    Led(0xc00c);
+
+    Steering(2);
+    Go(-400,-400);
+    delay(900);
+
+    Steering(3);
+    Go(-400,-400);
+    delay(1100);
+    
+    Led(0x0000);
+    Led(0x0003);
+    
+    Steering(2);
+    Go(400,400);
+    delay(1800);
+
+    Steering(3);
+    Go(400,400);
+    delay(600);
+
+    Steering(1);
+    Go(-400,-400);
+    delay(800);
+   
+    Steering(3);
+    Go(400,400);
+    delay(500);
+
+    Steering(2);
+    Go(400,400);
+    delay(1700);
+
+    Steering(3);
+    Go(400,400);
+    delay(600);
+
+    Steering(1);
+    Go(-400,-400);
+    delay(900);
+
+    Steering(3);
+    Go(400,400);
+    delay(700);
+
+    Steering(1);
+    Go(-400,-400);
+    delay(800);
+
+    Steering(3);
+    Go(400,400);
+    delay(700);
+
+    Steering(2);
+    Go(400,400);
+    delay(900);
+
+    Go(0,0);
+    
+    Led(0x0000);
+   
+    DisplayLine(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01);
+    Led(0x0020);
+    delay(500);
+    
+    DisplayLine(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x80);
+    Led(0x0080);
+    delay(500);  
+    
+    DisplayLine(0x00,0x00,0x00,0x00,0x00,0x00,0x80,0x00);
+    Led(0x0008);
+    delay(500);  
+    
+    DisplayLine(0x00,0x80,0x00,0x00,0x00,0x00,0x00,0x00);
+    Led(0x0004);
+    delay(500);
+    
+    DisplayLine(0x80,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Led(0x0040);
+    delay(500); 
+    
+    DisplayLine(0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+    Led(0x0010);
+    delay(500);
+    
+    DisplayLine(0x00,0x01,0x00,0x00,0x00,0x00,0x00,0x00);
+    Led(0x0001);
+    delay(500);
+    
+    DisplayLine(0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x00);
+    Led(0x0002);
+    delay(500);
+    
+    Led(0x0000);
+    DisplayLine(0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
+
+    Go(0,0);
+    delay(10000);
+    }
+  
+  while(1) {
+    data=Sensor(1);
+    ir1=data.IRSensor[0];
+    ir2=data.IRSensor[1];
+    ir3=data.IRSensor[2];
+    ir4=data.IRSensor[3];
+    ir5=data.IRSensor[4];
+    cds=48+data.CDSSensor;
+   if(cds>400){
+      break; } 
+     Auto(ir1,ir2,ir3,ir4,ir5);
+    }
+}
+
+void Auto(int ir1, int ir2, int ir3, int ir4,int ir5)
+{
+  if(ir1>35 && ir2>50 && ir3>30) {
+    Go(backward_speed,backward_speed);
+    Steering(1);
+  }
+  else if(ir1>35 && ir2>50) {
+    Go(backward_speed,backward_speed);
+    Steering(1);
+  }
+  else if(ir1>33) {
+    Go(backward_speed,backward_speed);
+    Steering(1);
+  }
+  else if(ir1>20 && ir5 >30) {
+    Go(forward_speed,forward_speed);
+    Steering(3);
+  }  
+  else if(ir1>20) {
+    Go(forward_speed,forward_speed);
+    Steering(3);
+  }  
+  else if(ir3>43) {
+    Go(forward_speed,forward_speed);
+    Steering(1);
+  }
+  else {
+    Go(forward_speed, forward_speed);
+    Steering(2);
+  }
+}
